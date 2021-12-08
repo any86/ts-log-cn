@@ -1,6 +1,24 @@
-# ts-log-cn
+# ts-log-cn(翻译中...)
 
 从typescript的更新日志中筛选一些**类型相关**的知识点, **类型推断的变化(放宽)和配置项会以及ecma的新增语法选录**.
+
+## v3.9
+### // @ts-expect-error
+用来屏蔽错误, 不同于"// @ts-ignore"的使用动机, "// @ts-expect-error"主要的使用场景是你故意产生错的, 比如测试用例.
+
+```typescript
+function doStuff(abc: string, xyz: string) {
+  assert(typeof abc === "string");
+  assert(typeof xyz === "string");
+}
+
+// 你想测试传入数字参数, 但是ts会自动推断错误, 这不是你想要的, 所以加"// @ts-expect-error"
+expect(() => {
+  // @ts-expect-error
+  doStuff(123, 456);
+}).toThrow();
+
+```
 
 ## v3.8
 ### import type / export type
@@ -42,22 +60,6 @@ export {};
 ```
 还有一个限制就是配置项: "target"为es2017以上且"module"为"esnext"
 
-### // @ts-expect-error
-用来屏蔽错误, 不同于"// @ts-ignore"的使用动机, "// @ts-expect-error"主要的使用场景是你故意产生错的, 比如测试用例.
-
-```typescript
-function doStuff(abc: string, xyz: string) {
-  assert(typeof abc === "string");
-  assert(typeof xyz === "string");
-}
-
-// 你想测试传入数字参数, 但是ts会自动推断错误, 这不是你想要的, 所以加"// @ts-expect-error"
-expect(() => {
-  // @ts-expect-error
-  doStuff(123, 456);
-}).toThrow();
-
-```
 
 ## v3.4
 ### readonlyArray
