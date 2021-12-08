@@ -272,34 +272,3 @@ declare module "json!*" {
     export default value;
 }
 ```
-
-
-
-## v1.5
-
-## v1.3
-
-### protect
-
-类的 protect 修饰符, 防止在类的外部访问.
-
-```typescript
-class Thing {
-  protected doSomething() {
-    /* ... */
-  }
-}
-class MyThing extends Thing {
-  public myMethod() {
-    // 子类可以访问父类中protected的方法
-    this.doSomething();
-  }
-}
-var t = new Thing();
-t.doSomething(); // 错误, 实例不能访问
-
-var mt = new MyThing();
-mt.doSomething(); // 错误, 子类实例也不能访问
-```
-
-### Tuple(元祖)
