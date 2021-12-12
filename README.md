@@ -1,6 +1,63 @@
-# ts 更新日志精选, 持续更新...
+# ts 更新日志速读, 持续更新...
 
-从 typescript 的更新日志中筛选**类型相关**的知识点, **类型推断的变化(放宽)和配置项以及 ECMA 的新增语法选录**.
+## 🔥 阅读须知
+
+由于个人能力有限, 所以本文只从"typescript 更新日志"中筛选**类型/语法**相关的知识点, 3.1之前的版本都是一些基础知识, 所以只摘取了部分内容. 如有错误还请各位多多指点帮助.
+
+**注意**: 类型推断的变化(放宽/收窄)和配置项以及 ECMA 的新增语法选录.
+
+## v4.5
+
+### 新增 Await 类型
+
+获取 Prmoise 的 resolve 的值的类型
+
+```typescript
+// Promise<number>
+const p = Promise.resolve(123);
+// Awaited<Promise<number>> === number
+type B = Awaited<typeof p>;
+
+// 类型参数不是Promise类型,
+// 那么不处理, 直接返回
+type S = Awaited<string>; // string
+```
+
+### 导入名称修饰符"type"
+之前版本就支持"import type {xx} from 'xxx'"的语法, 现在进步支持对单个导入项标记"type".
+
+```typescript
+import { someFunc, type BaseType } from "./some-module.js";
+```
+
+### 检查类的私有属性是否存在
+同步兼容ecma语法
+```typescript
+class Person {
+    #name: string;
+    constructor(name: string) {
+        this.#name = name;
+    }
+    equals(other: unknown) {
+        return other &&
+            typeof other === "object" &&
+            #name in other && // <- 🔥新语法
+            this.#name === other.#name;
+    }
+}
+```
+### 导入断言
+同步兼容ecma语法, 对导入文件进行运行时判断, ts不做任何判断.
+```typescript
+import obj from "./something.json" assert { type: "json" };
+```
+还有"import"函数的语法:
+```typescript
+const obj = await import("./something.json", {
+  assert: { type: "json" },
+});
+```
+
 
 ## v4.4
 
@@ -18,20 +75,90 @@ if (typeof input === "number") {
 }
 ```
 
-如果`typeof input === 'number'`抽象到变量中,在 4.4 版本之前,类型保护会失效:
+如果`typeof input === 'number'`抽象到变量中,在 4.4 版本之前类型保护会失效,但是在 4.4 中 ts 可以正确的类型保护了.
 
 ```typescript
 function nOrs() {
   return Math.random() > 0.5 ? 123 : "abc";
 }
-let input = nOrs();
+const input = nOrs();
 const isNumber = typeof input === "number";
 if (isNumber) {
   // 失效,无法知道input是number类型
   input++;
 }
 ```
-但是在4.4中ts可以正确的类型保护了.
+
+**注意**: 要求被保护的必须是"const 的变量"或者"realdonly 的属性", 比如上面的 input 和下面的"n"属性.
+
+```typescript
+interface A {
+  readonly n: number | string;
+}
+
+const a: A = { n: Math.random() > 0.5 ? "123" : 321 };
+const isNumber = typeof a.n === "number";
+if (isNumber) {
+  // r是number
+  const r = a.n;
+}
+```
+
+### 类型保护更深入
+
+通过属性的判断可以缩小联合类型的范围.
+
+```typescript
+type Shape =
+  | { kind: "circle"; radius: number }
+  | { kind: "square"; sideLength: number };
+
+function area(shape: Shape): number {
+  const isCircle = shape.kind === "circle";
+  if (isCircle) {
+    // We know we have a circle here!
+    return Math.PI * shape.radius ** 2;
+  } else {
+    // We know we're left with a square here!
+    return shape.sideLength ** 2;
+  }
+}
+```
+
+### ⚡ 增加支持 symbol 类型做为对象类型的键
+
+之前只支持"string | number ", 造成对 Object 类型的键的描述不全面, 现在解决了.
+
+```typescript
+interface Test1 {
+  [k: string | number | symbol]: any;
+}
+
+type Test2 = {
+  [k in string | number | symbol]: any;
+};
+```
+
+## 类中的 static 块
+
+同步支持 es 新语法
+
+```typescript
+class Foo {
+  static #count = 0;
+
+  get count() {
+    return Foo.#count;
+  }
+
+  static {
+    try {
+      const lastInstances = loadLastInstances();
+      Foo.#count += lastInstances.length;
+    } catch {}
+  }
+}
+```
 
 ## v4.3
 
