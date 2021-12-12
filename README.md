@@ -1,6 +1,107 @@
-# ts-log-cn(翻译中...)
+# ts 更新日志精选, 持续更新...
 
 从 typescript 的更新日志中筛选**类型相关**的知识点, **类型推断的变化(放宽)和配置项以及 ECMA 的新增语法选录**.
+
+## v4.4
+
+### 类型保护更智能
+
+常见的类型保护如下:
+
+```typescript
+function nOrs() {
+  return Math.random() > 0.5 ? 123 : "abc";
+}
+let input = nOrs();
+if (typeof input === "number") {
+  input++;
+}
+```
+
+如果`typeof input === 'number'`抽象到变量中,在 4.4 版本之前,类型保护会失效:
+
+```typescript
+function nOrs() {
+  return Math.random() > 0.5 ? 123 : "abc";
+}
+let input = nOrs();
+const isNumber = typeof input === "number";
+if (isNumber) {
+  // 失效,无法知道input是number类型
+  input++;
+}
+```
+但是在4.4中ts可以正确的类型保护了.
+
+## v4.3
+
+### override 关键字
+
+"override"是给类提供的语法, 用来标记子类中的属性/方法是否覆盖父类的同名属性/方法.
+
+```typescript
+class A {}
+
+class B extends A {
+  // 提示不能用override, 因为基类中没有"a"字段.
+  override a() {}
+}
+```
+
+### 注释中的@link
+
+点击跳转到指定代码.
+
+```typescript
+/**
+ * To be called 70 to 80 days after {@link plantCarrot}.
+ */
+function harvestCarrot(carrot: Carrot) {}
+/**
+ * Call early in spring for best results. Added in v2.1.0.
+ * @param seed Make sure it's a carrot seed!
+ */
+function plantCarrot(seed: Seed) {
+  // TODO: some gardening
+}
+```
+
+## v4.2
+
+### 元祖支持可选符号
+
+```typescript
+let c: [string, string?] = ["hello"];
+c = ["hello", "world"];
+```
+
+### 元祖类型定义支持任意位置使用"..."
+
+但是要求尾部不能有可选元素(?)和"..."出现
+
+```typescript
+let foo: [...string[], number];
+
+foo = [123];
+foo = ["hello", 123];
+foo = ["hello!", "hello!", "hello!", 123];
+
+let bar: [boolean, ...string[], boolean];
+
+bar = [true, false];
+bar = [true, "some text", false];
+bar = [true, "some", "separated", "text", false];
+```
+
+**错误示例**
+
+```typescript
+let StealersWheel: [...Clown[], "me", ...Joker[]];
+// A rest element cannot follow another rest element.
+
+let StringsAndMaybeBoolean: [...string[], boolean?];
+// An optional element cannot follow a rest element.
+```
 
 ## v4.1
 
@@ -35,7 +136,9 @@ type S4 = Uncapitalize<"ABC">;
 ```
 
 ### key in 结构中使用 as
-获取key后用来获取值, 但是不用key,只用值, 然后重新标注key.
+
+获取 key 后用来获取值, 但是不用 key,只用值, 然后重新标注 key.
+
 ```typescript
 type PPP<T> = {
   [K in keyof T as "ww"]: T[K];
@@ -68,10 +171,13 @@ const r2 = tail([...myTuple, ...myArray] as const);
 
 ### rest 元素可以出现在元组中的任何地方, 而不仅仅是在最后！
 
+这里要求"..."后面的元素必须是元组, 只有最后一个元素可以是"..."+"数组"
+
 ```typescript
 type Strings = [string, string];
 type Numbers = [number, number];
 type StrStrNumNumBool = [...Strings, ...Numbers, boolean];
+type StrStrNumNumBool = [...[string], string, ...string[]];
 ```
 
 ### 元组元素支持带标签
