@@ -572,21 +572,24 @@ type ReadonlyPartial<T> = { +readonly [P in keyof T]+?: T[P] }; // 添加readonl
 ### 用常量命名的类型的属性
 
 常量可以用来表示类型的属性.
+
 ```typescript
 export const Key = "123abc";
 export interface Map {
   [Key]: string;
 }
 ```
+
 ### unique symbol 类型
-symbol类型的子类型, 只能在有const/readonly的情况下才可以使用, 表示唯一不可变.
+
+symbol 类型的子类型, 只能在有 const/readonly 的情况下才可以使用, 表示唯一不可变.
 
 ```typescript
 // 正确
 const bar: unique symbol = Symbol();
 // 正确
-interface M{
-   readonly a:unique symbol;
+interface M {
+  readonly a: unique symbol;
 }
 
 // 错误, 不能用let
@@ -714,5 +717,25 @@ declare module "*!text" {
 declare module "json!*" {
   const value: any;
   export default value;
+}
+```
+
+## 其他
+🤩 有些我也不知道是那个版本的语法, 但是在别人的代码中看到了, 所以收录下.
+
+### 构造函数的参数可以用来声明类的属性
+算是一种简写, 在vue3的computed部分的代码中看到.
+```typescript
+class Www {
+  constructor(private readonly a1: number) {
+    this.a1 = 123;
+  }
+}
+// 等价于
+class Www {
+  private readonly a1: number;
+  constructor() {
+    this.a1 = 123;
+  }
 }
 ```
