@@ -275,6 +275,21 @@ type PPP<T> = {
 // type A = {ww:1|'2'}
 type A = PPP<{ a: 1; b: "2" }>;
 ```
+### Promise中resolve的参数不再为可选
+4.1之前版本resolve可以不传参数, 现在不允许.
+```typescript
+new Promise((resolve) => {
+    // 报错,resolve参数不能为空
+    resolve();
+});
+```
+**除非**对Promise传入类型参数"void":
+```typescript
+// 正确
+new Promise<void>((resolve) => {
+    resolve();
+});
+```
 
 ## v4.0
 
