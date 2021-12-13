@@ -1,9 +1,10 @@
 # ts 更新日志速读, 持续更新...
+
 个人学习为主, 顺便方便他人.😉
 
 ## 🔥 阅读须知
 
-由于个人能力有限, 所以本文只从"typescript 更新日志"中筛选**类型/语法**相关的知识点, 3.1之前的版本都是一些基础知识, 所以只摘取了部分内容. 如有错误还请各位多多指点帮助.
+由于个人能力有限, 所以本文只从"typescript 更新日志"中筛选**类型/语法**相关的知识点, 3.1 之前的版本都是一些基础知识, 所以只摘取了部分内容. 如有错误还请各位多多指点帮助.
 
 **注意**: 类型推断的变化(放宽/收窄)和配置项以及 ECMA 的新增语法选录.
 
@@ -25,6 +26,7 @@ type S = Awaited<string>; // string
 ```
 
 ### 导入名称修饰符"type"
+
 之前版本就支持"import type {xx} from 'xxx'"的语法, 现在进步支持对单个导入项标记"type".
 
 ```typescript
@@ -32,7 +34,9 @@ import { someFunc, type BaseType } from "./some-module.js";
 ```
 
 ### 检查类的私有属性是否存在
-同步兼容ecma语法
+
+同步兼容 ecma 语法
+
 ```typescript
 class Person {
     #name: string;
@@ -47,18 +51,22 @@ class Person {
     }
 }
 ```
+
 ### 导入断言
-同步兼容ecma语法, 对导入文件进行运行时判断, ts不做任何判断.
+
+同步兼容 ecma 语法, 对导入文件进行运行时判断, ts 不做任何判断.
+
 ```typescript
 import obj from "./something.json" assert { type: "json" };
 ```
+
 还有"import"函数的语法:
+
 ```typescript
 const obj = await import("./something.json", {
   assert: { type: "json" },
 });
 ```
-
 
 ## v4.4
 
@@ -275,19 +283,24 @@ type PPP<T> = {
 // type A = {ww:1|'2'}
 type A = PPP<{ a: 1; b: "2" }>;
 ```
-### Promise中resolve的参数不再为可选
-4.1之前版本resolve可以不传参数, 现在不允许.
+
+### Promise 中 resolve 的参数不再为可选
+
+4.1 之前版本 resolve 可以不传参数, 现在不允许.
+
 ```typescript
 new Promise((resolve) => {
-    // 报错,resolve参数不能为空
-    resolve();
+  // 报错,resolve参数不能为空
+  resolve();
 });
 ```
-**除非**对Promise传入类型参数"void":
+
+**除非**对 Promise 传入类型参数"void":
+
 ```typescript
 // 正确
 new Promise<void>((resolve) => {
-    resolve();
+  resolve();
 });
 ```
 
@@ -529,7 +542,13 @@ let bar: bigint = 100n; // a BigInt literal
 
 ## v2.9
 
-### import 类型
+### import.meta
+
+同步 ecma 语法, 存储模块信息的对象. 具体参看[MDN](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Statements/import.meta).
+
+### 支持导入 JSON 文件
+
+通过在 tsconfig 中开启 resolveJsonModule:true;
 
 ### 新的--declarationMap
 
@@ -549,6 +568,30 @@ type ReadonlyPartial<T> = { +readonly [P in keyof T]+?: T[P] }; // 添加readonl
 ```
 
 ## v2.7
+
+### 用常量命名的类型的属性
+
+常量可以用来表示类型的属性.
+```typescript
+export const Key = "123abc";
+export interface Map {
+  [Key]: string;
+}
+```
+### unique symbol 类型
+symbol类型的子类型, 只能在有const/readonly的情况下才可以使用, 表示唯一不可变.
+
+```typescript
+// 正确
+const bar: unique symbol = Symbol();
+// 正确
+interface M{
+   readonly a:unique symbol;
+}
+
+// 错误, 不能用let
+let bar: unique symbol = Symbol();
+```
 
 ### let x!: number[];
 
