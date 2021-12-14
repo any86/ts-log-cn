@@ -68,6 +68,16 @@ const obj = await import("./something.json", {
 });
 ```
 
+### 未使用的变量不删除
+tsconfig增加了一个配置项"preserveValueImports", 用来保留未使用的变量, 意义在于vue的setup模式下, js定义的变量, 只在模板中使用, ts识别不到"已使用", 有了这个选项就可以保留变量.
+```html
+<!-- A .vue File -->
+<script setup>
+  import { someFunc } from "./some-module.js";
+</script>
+<button @click="someFunc">Click me!</button>
+```
+
 ## v4.4
 
 ### 类型保护更智能
