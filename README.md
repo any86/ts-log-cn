@@ -194,9 +194,9 @@ class B extends A {
 }
 ```
 
-### 注释中的@link
+### 注释中的{@link xxx}
 
-点击跳转到指定代码.
+点击跳转到指定代码, 属于行内标签.
 
 ```typescript
 /**
